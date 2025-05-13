@@ -208,7 +208,7 @@ def post_we_processing(we_model, pos_preds, balanced_negative_pairs):
     logger.info("Processing word embeddings for training")
     
     def get_word_vec(word):
-        return we_model.wv.get_vector(word)
+        return we_model.wv.get_vector(word.lower())
 
     pos_drugs_vec = pos_preds.SUBJECT_CUI.apply(get_word_vec)
     pos_disease_vec = pos_preds.OBJECT_CUI.apply(get_word_vec)

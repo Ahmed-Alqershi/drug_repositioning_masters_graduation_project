@@ -18,6 +18,7 @@ from tensorflow.keras.optimizers.schedules import (
     ExponentialDecay, PiecewiseConstantDecay, CosineDecay
 )
 from sklearn.model_selection import StratifiedKFold as KFold
+from sklearn.utils import class_weight
 
 logger = logging.getLogger(__name__)
 
@@ -332,6 +333,14 @@ def model_compilation_training(
     kfold = KFold(n_splits=n_splits, shuffle=True)
     
     histories = []
+
+    class_weights = class_weight.compute_class_weight(
+        class_weight='balanced',
+        classes=np.unique(labels),
+        y=labels
+    )
+    class_weight_dict = dict(enumerate(class_weights))
+
     
     # Perform cross-validation
     for fold, (train_idx, val_idx) in enumerate(kfold.split(drugs, labels)):
@@ -348,19 +357,24 @@ def model_compilation_training(
             epochs=epochs,
             batch_size=batch_size,
             callbacks=callbacks,
+            # class_weight=class_weight_dict
         )
 
         histories.append(history)
         
         # Save the model for each fold
-        fold_model_path = os.path.join(model_dir, f"snn_model_fold_{fold + 1}.keras")
-        model.save(fold_model_path)
-        logger.info(f"Model for fold {fold + 1} saved to {fold_model_path}")
+        # fold_model_path = os.path.join(model_dir, f"snn_model_fold_{fold + 1}.keras")
+        # model.save(fold_model_path)
+        # logger.info(f"Model for fold {fold + 1} saved to {fold_model_path}")
         
         # Log training results for each fold
         best_val_accuracy = round(max(history.history['val_accuracy'])*100, 2)
         best_val_loss = round(min(history.history['val_loss']), 2)
+        best_val_precision = round(max(history.history['val_precision']), 2)
+        best_val_recall = round(max(history.history['val_recall']), 2)
         logger.info(f"Fold {fold + 1} - Best validation accuracy: {best_val_accuracy}%")
         logger.info(f"Fold {fold + 1} - Best validation loss: {best_val_loss}")
+        logger.info(f"Fold {fold + 1} - Best validation precision: {best_val_precision}")
+        logger.info(f"Fold {fold + 1} - Best validation recall: {best_val_recall}")
     
     return histories

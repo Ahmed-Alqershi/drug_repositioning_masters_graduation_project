@@ -26,18 +26,26 @@ def save_experiment_metrics(args, histories, time_taken, save_dir="results"):
     # Aggregate metrics from histories
     avg_val_accuracy = []
     avg_val_loss = []
+    avg_val_precision = []
+    avg_val_recall = []
     
     for history in histories:
         avg_val_accuracy.append(max(history.history['val_accuracy']))
         avg_val_loss.append(min(history.history['val_loss']))
+        avg_val_precision.append(max(history.history['val_precision']))
+        avg_val_recall.append(max(history.history['val_recall']))
     
     best_val_accuracy = round(np.mean(avg_val_accuracy) * 100, 2)
     best_val_loss = round(np.mean(avg_val_loss), 2)
+    best_val_precision = round(np.mean(avg_val_precision), 2)
+    best_val_recall = round(np.mean(avg_val_recall), 2)
     
     new_metrics = {
         "args": vars(args),
         "best_val_accuracy": best_val_accuracy,
         "best_val_loss": best_val_loss,
+        "best_val_precision": best_val_precision,
+        "best_val_recall": best_val_recall,
         "time_taken": time_taken
     }
     

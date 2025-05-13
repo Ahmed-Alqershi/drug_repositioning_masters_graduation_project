@@ -195,8 +195,8 @@ def main():
     
     # Create evaluation plots
     plot_confusion_matrix(labels_val, val_predictions)
-    plot_roc_curve(labels_val, val_predictions)
-    plot_precision_recall_curve(labels_val, val_predictions)
+    # plot_roc_curve(labels_val, val_predictions)
+    # plot_precision_recall_curve(labels_val, val_predictions)
     
     # Record execution time
     end = time.time()
